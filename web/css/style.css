@@ -238,6 +238,31 @@ body {
   cursor: pointer;
 }
 
+.pms-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.pms-row input[type="text"] {
+  width: 160px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+}
+
+.pms-row input[type="text"]:focus {
+  outline: 2px solid var(--primary);
+  border-color: var(--primary);
+}
+
 .swatches {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));

@@ -12,6 +12,7 @@
   const logoImg = document.getElementById("logo-img");
   const swatchesEl = document.getElementById("swatches");
   const colorInput = document.getElementById("color-input");
+  const pmsInput = document.getElementById("pms-input");
   const colorNameEl = document.getElementById("color-name");
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("file-input");
@@ -57,6 +58,7 @@
     b.addEventListener("click", () => {
       setColor(c.hex, c.name);
       colorInput.value = c.hex;
+      pmsInput.value = c.name.replace(/^PMS\s*/i, "");
     });
     swatchesEl.appendChild(b);
   });
@@ -85,6 +87,22 @@
   /* ---------- Farbe ---------- */
   colorInput.addEventListener("input", (e) => {
     setColor(e.target.value, null);
+  });
+
+  pmsInput.addEventListener("input", () => {
+    const code = pmsInput.value.trim();
+    if (!code) return;
+    const key = normalizePms(code);
+    const match = PANTONE_LOOKUP[key];
+    if (match) {
+      setColor(match.hex, match.name);
+      colorInput.value = match.hex;
+    } else {
+      setColor(PMS_FALLBACK_HEX, null);
+      colorNameEl.textContent = "PMS " + key + " (nicht in Vorschau, Farbabstimmung nötig)";
+      state.pantone = "PMS " + key;
+      updateSummary();
+    }
   });
 
   function setColor(hex, name) {
@@ -233,5 +251,6 @@
   /* ---------- Init ---------- */
   setSize(state.size);
   setColor(state.hex, state.pantone);
+  pmsInput.value = state.pantone.replace(/^PMS\s*/i, "");
   updateSummary();
 })();
