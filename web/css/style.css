@@ -160,8 +160,43 @@ body {
   top: 84px;
 }
 
-#bottle-wrap { max-width: 320px; margin: 0 auto; }
-#flasche { width: 100%; height: auto; display: block; }
+#bottle-stage {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto;
+  line-height: 0;
+}
+#bottle-base {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#bottle-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+#logo-overlay {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  line-height: 0;
+}
+#logo-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+}
 
 .preview-hint {
   font-size: 0.8rem;

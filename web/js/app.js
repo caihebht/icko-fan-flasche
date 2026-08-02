@@ -5,11 +5,11 @@
 (function () {
   "use strict";
 
-  const svg = document.getElementById("flasche");
-  const bottle05 = document.getElementById("flasche-05");
-  const bottle10 = document.getElementById("flasche-10");
-  const logoImg05 = document.getElementById("logo-img-05");
-  const logoImg10 = document.getElementById("logo-img-10");
+  const bottleStage = document.getElementById("bottle-stage");
+  const bottleBase = document.getElementById("bottle-base");
+  const bottleTint = document.getElementById("bottle-tint");
+  const logoOverlay = document.getElementById("logo-overlay");
+  const logoImg = document.getElementById("logo-img");
   const swatchesEl = document.getElementById("swatches");
   const colorInput = document.getElementById("color-input");
   const colorNameEl = document.getElementById("color-name");
@@ -19,6 +19,19 @@
   const logoRemove = document.getElementById("logo-remove");
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
+
+  const ASSETS = {
+    "05": {
+      base: "assets/flasche-05-base.png",
+      tint: "assets/flasche-05-tint.png",
+      ratio: 420 / 1150,
+    },
+    "10": {
+      base: "assets/flasche-10-base.png",
+      tint: "assets/flasche-10-tint.png",
+      ratio: 480 / 1240,
+    },
+  };
 
   const state = {
     size: "05",
@@ -60,8 +73,12 @@
     document.querySelectorAll("#size-group .btn-toggle").forEach((b) =>
       b.classList.toggle("active", b.dataset.size === size)
     );
-    bottle05.style.display = size === "05" ? "" : "none";
-    bottle10.style.display = size === "10" ? "" : "none";
+    const a = ASSETS[size];
+    bottleBase.src = a.base;
+    bottleTint.style.webkitMaskImage = "url(" + a.tint + ")";
+    bottleTint.style.maskImage = "url(" + a.tint + ")";
+    bottleBase.alt = "Vorschau der konfigurierten Icko Fan-Flasche (" +
+      (size === "05" ? "0,5 l" : "1,0 l") + ")";
     updateSummary();
   }
 
@@ -73,7 +90,7 @@
   function setColor(hex, name) {
     state.hex = hex;
     state.pantone = name;
-    svg.style.setProperty("--bottle-color", hex);
+    bottleTint.style.backgroundColor = hex;
     if (name) {
       colorNameEl.textContent = name;
     } else {
@@ -149,29 +166,25 @@
 
   function applyLogo() {
     const hasLogo = !!state.logo;
-    const imgs = [logoImg05, logoImg10];
-
-    imgs.forEach((img) => {
-      if (hasLogo) {
-        img.setAttribute("href", state.logo);
-        img.style.display = "block";
-        const scale = state.logoScale / 100;
-        const cx = parseFloat(img.getAttribute("x")) + parseFloat(img.getAttribute("width")) / 2;
-        const cy = parseFloat(img.getAttribute("y")) + parseFloat(img.getAttribute("height")) / 2;
-        img.setAttribute("transform",
-          `translate(${state.logoX} ${state.logoY}) translate(${cx} ${cy}) rotate(${state.logoRotate}) scale(${scale}) translate(${-cx} ${-cy})`);
-      } else {
-        img.removeAttribute("href");
-        img.removeAttribute("transform");
-        img.style.display = "none";
-      }
-    });
-
+    if (hasLogo) {
+      logoImg.src = state.logo;
+      logoOverlay.hidden = false;
+      // Skalierung relativ zur Bühne
+      const w = bottleStage.clientWidth;
+      const scale = state.logoScale / 100;
+      const translateX = state.logoX * w * 0.004;   // -30..30 → ±12 % Breite
+      const translateY = state.logoY * w * 0.0025;  // -40..40 → ±10 % Breite
+      logoImg.style.transform =
+        "translate(" + translateX + "px," + translateY + "px) " +
+        "rotate(" + state.logoRotate + "deg) " +
+        "scale(" + scale + ")";
+    } else {
+      logoOverlay.hidden = true;
+      logoImg.removeAttribute("src");
+      logoImg.removeAttribute("style");
+    }
     dropzone.hidden = hasLogo;
     logoControls.hidden = !hasLogo;
-    document.querySelectorAll(".logo-placeholder").forEach((el) => {
-      el.style.display = hasLogo ? "none" : "";
-    });
     updateSummary();
   }
 
@@ -218,6 +231,7 @@
   }
 
   /* ---------- Init ---------- */
+  setSize(state.size);
   setColor(state.hex, state.pantone);
   updateSummary();
 })();
