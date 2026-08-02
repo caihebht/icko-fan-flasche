@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icko Fan-Flasche – Konfigurator</title>
+  <meta name="description" content="Konfiguriere deine Icko Fan-Flasche: Farbe und Logo frei wählen. Erhältlich in 0,5 l und 1,0 l, jede Pantone-Farbe möglich.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <span class="logo-text">IC<span class="accent">KO</span> <small>Fan-Flasche</small></span>
+      <nav class="site-nav">
+        <a href="#konfigurator">Konfigurator</a>
+        <a href="#features">Features</a>
+        <a href="#preise">Preise</a>
+        <a href="#verpackung">Verpackung</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <h1>Deine Flasche. Deine Farbe. Dein Logo.</h1>
+        <p class="lead">Die Icko Fan-Flasche in 0,5 l oder 1,0 l – mit Doppelwand-Vakuum-Edelstahl,
+          in jeder Pantone-Farbe und mit UV-Logodruck. Konfiguriere jetzt online.</p>
+        <a class="btn btn-primary" href="#konfigurator">Jetzt konfigurieren</a>
+      </div>
+    </section>
+
+    <!-- KONFIGURATOR -->
+    <section id="konfigurator" class="section">
+      <div class="container">
+        <h2>Konfigurator</h2>
+        <p class="sub">Wähle Größe, Farbe und dein Logo – die Vorschau aktualisiert sich live.</p>
+
+        <div class="config-grid">
+
+          <!-- Vorschau -->
+          <div class="preview-panel">
+            <div id="bottle-wrap">
+              <svg id="flasche" viewBox="0 0 200 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vorschau der konfigurierten Icko Fan-Flasche">
+
+                <defs>
+                  <linearGradient id="gloss-05" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/>
+                    <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.05"/>
+                    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="gloss-10" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/>
+                    <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.05"/>
+                    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                  </linearGradient>
+                  <clipPath id="logo-clip-05">
+                    <rect x="66" y="160" width="68" height="80" rx="8"/>
+                  </clipPath>
+                  <clipPath id="logo-clip-10">
+                    <rect x="64" y="170" width="72" height="100" rx="8"/>
+                  </clipPath>
+                </defs>
+
+                <!-- ============ 0,5 Liter ============ -->
+                <g id="flasche-05">
+                  <rect x="72" y="12" width="56" height="42" rx="9" fill="#3a3f46"/>
+                  <rect x="78" y="10" width="44" height="10" rx="5" fill="#565d66"/>
+                  <rect x="66" y="50" width="68" height="12" rx="6" fill="#2e3339"/>
+                  <rect x="84" y="62" width="32" height="40" rx="10" fill="var(--bottle-color)"/>
+                  <rect x="55" y="96" width="90" height="240" rx="44" fill="var(--bottle-color)"/>
+                  <rect x="60" y="104" width="20" height="224" rx="10" fill="url(#gloss-05)"/>
+                  <rect x="55" y="300" width="90" height="36" rx="18" fill="#000000" opacity="0.14"/>
+                  <circle cx="84" cy="120" r="7" fill="#ffffff" opacity="0.5"/>
+
+                  <rect x="66" y="160" width="68" height="80" rx="8" fill="none" stroke="var(--logo-border, #8b949e)" stroke-width="1.5" stroke-dasharray="5 4" class="logo-placeholder"/>
+                  <text x="100" y="205" text-anchor="middle" fill="var(--logo-border, #8b949e)" font-size="12" class="logo-placeholder">Logo</text>
+                  <image id="logo-img-05" href="" x="66" y="160" width="68" height="80" clip-path="url(#logo-clip-05)" preserveAspectRatio="xMidYMid meet" style="display:none"/>
+                </g>
+
+                <!-- ============ 1,0 Liter ============ -->
+                <g id="flasche-10" style="display:none">
+                  <rect x="72" y="12" width="56" height="42" rx="9" fill="#3a3f46"/>
+                  <rect x="78" y="10" width="44" height="10" rx="5" fill="#565d66"/>
+                  <rect x="66" y="50" width="68" height="12" rx="6" fill="#2e3339"/>
+                  <rect x="84" y="62" width="32" height="40" rx="10" fill="var(--bottle-color)"/>
+                  <rect x="52" y="96" width="96" height="330" rx="48" fill="var(--bottle-color)"/>
+                  <rect x="57" y="104" width="22" height="314" rx="11" fill="url(#gloss-10)"/>
+                  <rect x="52" y="390" width="96" height="36" rx="18" fill="#000000" opacity="0.14"/>
+                  <circle cx="80" cy="120" r="8" fill="#ffffff" opacity="0.5"/>
+
+                  <rect x="64" y="170" width="72" height="100" rx="8" fill="none" stroke="var(--logo-border, #8b949e)" stroke-width="1.5" stroke-dasharray="5 4" class="logo-placeholder"/>
+                  <text x="100" y="225" text-anchor="middle" fill="var(--logo-border, #8b949e)" font-size="12" class="logo-placeholder">Logo</text>
+                  <image id="logo-img-10" href="" x="64" y="170" width="72" height="100" clip-path="url(#logo-clip-10)" preserveAspectRatio="xMidYMid meet" style="display:none"/>
+                </g>
+
+              </svg>
+            </div>
+            <p class="preview-hint">Hinweis: Farbwirkung auf dem Bildschirm ist eine Annäherung. Die exakte Farbe zeigt der echte UV-Druck.</p>
+          </div>
+
+          <!-- Konfigurations-Bedienung -->
+          <div class="config-panel">
+
+            <div class="cfg-block">
+              <h3>1. Größe</h3>
+              <div class="btn-group" id="size-group">
+                <button type="button" class="btn btn-toggle active" data-size="05">0,5 l</button>
+                <button type="button" class="btn btn-toggle" data-size="10">1,0 l</button>
+              </div>
+            </div>
+
+            <div class="cfg-block">
+              <h3>2. Farbe <span id="color-name" class="color-label">–</span></h3>
+              <label class="color-picker-row">
+                <input type="color" id="color-input" value="#DA291C">
+                <span>Eigene Farbe wählen</span>
+              </label>
+              <div class="swatches" id="swatches"></div>
+            </div>
+
+            <div class="cfg-block">
+              <h3>3. Logo</h3>
+              <div class="dropzone" id="dropzone">
+                <input type="file" id="file-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+                <p>Klicken oder Bild hierher ziehen</p>
+                <p class="dropzone-sub">PNG, JPG, SVG, WebP</p>
+              </div>
+              <div class="logo-controls" id="logo-controls" hidden>
+                <label class="range-row">
+                  <span>Position X</span>
+                  <input type="range" id="logo-x" min="-30" max="30" value="0" step="1">
+                </label>
+                <label class="range-row">
+                  <span>Position Y</span>
+                  <input type="range" id="logo-y" min="-40" max="40" value="0" step="1">
+                </label>
+                <label class="range-row">
+                  <span>Größe</span>
+                  <input type="range" id="logo-scale" min="30" max="200" value="100" step="1">
+                </label>
+                <label class="range-row">
+                  <span>Drehung</span>
+                  <input type="range" id="logo-rotate" min="-180" max="180" value="0" step="1">
+                </label>
+                <button type="button" class="btn btn-ghost" id="logo-remove">Logo entfernen</button>
+              </div>
+            </div>
+
+            <div class="cfg-block">
+              <h3>4. Stückzahl</h3>
+              <div class="btn-group" id="qty-group">
+                <button type="button" class="btn btn-toggle active" data-qty="120">120</button>
+                <button type="button" class="btn btn-toggle" data-qty="600">600</button>
+                <button type="button" class="btn btn-toggle" data-qty="1200">1200</button>
+              </div>
+              <p class="qty-bonus" id="qty-bonus"></p>
+            </div>
+
+            <div class="cfg-block summary">
+              <h3>Zusammenfassung</h3>
+              <ul id="summary-list">
+                <li>Größe: <strong id="sum-size">0,5 l</strong></li>
+                <li>Farbe: <strong id="sum-color">–</strong></li>
+                <li>Logo: <strong id="sum-logo">nein</strong></li>
+                <li>Stückzahl: <strong id="sum-qty">120</strong></li>
+                <li>Stückpreis: <strong id="sum-price">12,00 €</strong></li>
+              </ul>
+              <p class="total">Gesamt: <strong id="sum-total">1.440,00 €</strong></p>
+              <a class="btn btn-primary" id="offer-link" href="#">Angebot anfragen</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section section-alt">
+      <div class="container">
+        <h2>Warum die Icko Fan-Flasche?</h2>
+        <div class="features-grid">
+          <article class="feature-card">
+            <h3>Vakuum-Edelstahl</h3>
+            <p>Doppelwandiger, lebensmittelechter SUS-304-Edelstahl. Kalt bis 24 h, warm bis 12 h.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Jede Pantone-Farbe</h3>
+            <p>Die Flasche ist in jeder Pantone (PMS)-Farbe lackiert – tausendfache Farbauswahl.</p>
+          </article>
+          <article class="feature-card">
+            <h3>UV-Logodruck</h3>
+            <p>Hochglanz-UV-Druck: kratzfest, abriebfest und mit intensiver Farbwirkung.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Eine Hand genügt</h3>
+            <p>Verschließbare Öffnung, auslaufsichere Silikonringverdichtung, tragbarer Deckel.</p>
+          </article>
+          <article class="feature-card">
+            <h3>BPA-frei</h3>
+            <p>Deckel aus PP-Kunststoff und PET-Saugrohr. Wiederverwendbar und umweltfreundlich.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Kratzfest</h3>
+            <p>Farbige Schutzlackierung hält Kratzern und Abnutzung stand (Eurofins-getestet).</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREISE -->
+    <section id="preise" class="section">
+      <div class="container">
+        <h2>Preise & Bestellmengen</h2>
+        <p class="sub">Lieferbedingung: DDP (geliefert verzollt). Preise inkl. MwSt. – Stand 01.06.2026, gültig bis 31.12.2026.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Stückzahl</th>
+                <th>0,5 l Flasche</th>
+                <th>1,0 l Flasche</th>
+                <th>Hinweis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>ab 120 Stk. (MOQ)</td><td>12,00 €</td><td>14,00 €</td><td>Mindestbestellmenge je Farbe & Druck</td></tr>
+              <tr><td>ab 600 Stk.</td><td>11,00 €</td><td>13,00 €</td><td>–</td></tr>
+              <tr><td>ab 1200 Stk.</td><td>11,00 €</td><td>13,00 €</td><td>+10 % Warenüberschuss gratis</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="sub">UVP Einzelhandel: 0,5 l = 20,00 € · 1,0 l = 30,00 €</p>
+      </div>
+    </section>
+
+    <!-- VERPACKUNG -->
+    <section id="verpackung" class="section section-alt">
+      <div class="container">
+        <h2>Verpackungsdetails</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th></th><th>0,5 l Flasche</th><th>1,0 l Flasche</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Größe der Schachtel</td><td>7,5 × 7,5 × 27 cm</td><td>9,5 × 9,5 × 30,5 cm</td></tr>
+              <tr><td>Volumen</td><td>0,0015 m³</td><td>0,0028 m³</td></tr>
+              <tr><td>Karton (Standard Export)</td><td>48 × 32 × 30 cm</td><td>59 × 40 × 33 cm</td></tr>
+              <tr><td>Karton-Volumen</td><td>0,046 m³</td><td>0,078 m³</td></tr>
+              <tr><td>Bruttogewicht</td><td>8,4 kg</td><td>12,5 kg</td></tr>
+              <tr><td>Stückzahl pro Karton</td><td>24 Stk.</td><td>24 Stk.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="sub">Ab 1.200 Stk. kann die Pappschachtel auf Kundenwunsch beliebig bedruckt werden.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Icko Fan-Flasche – Konfigurator-Demo</span>
+      <span id="footer-contact"><a href="mailto:info@icko.de">info@icko.de</a></span>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
