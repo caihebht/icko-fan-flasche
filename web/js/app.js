@@ -22,19 +22,19 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v5"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v6"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const ASSETS = {
     "05": {
       base: ASSET("assets/flasche-05-base.png"),
       tint: ASSET("assets/flasche-05-tint.png"),
-      ratio: 203 / 743,
+      ratio: 406 / 1486,
     },
     "10": {
       base: ASSET("assets/flasche-10-base.png"),
       tint: ASSET("assets/flasche-10-tint.png"),
-      ratio: 274 / 911,
+      ratio: 548 / 1822,
     },
   };
 
