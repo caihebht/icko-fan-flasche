@@ -36,6 +36,14 @@
 
   const DEFAULT_LOGO = "assets/logo-icko-rund-weiss.png";
 
+  // Logo nimmt ca. 40 % der Breite des Flaschenkörpers ein.
+  // Der Ring des runden ICKO-Logos ist nur ~84 % der PNG-Kantenlänge,
+  // deshalb wird das Element entsprechend größer skaliert, damit der
+  // sichtbare Kreis wirklich 40 % der Körperbreite misst.
+  const LOGO_BODY_FRACTION = 0.40;
+  const LOGO_RING_FRACTION = 0.843; // nur für das runde Standard-Logo
+  const LOGO_BODY_FALLBACK = 0.94;  // Körperbreite / Bildbreite (Fallback)
+
   const state = {
     size: "05",
     qty: "120",
@@ -83,7 +91,60 @@
     bottleTint.style.maskImage = "url(" + a.tint + ")";
     bottleBase.alt = "Vorschau der konfigurierten Icko Fan-Flasche (" +
       (size === "05" ? "0,5 l" : "1,0 l") + ")";
+    setLogoWidth();
     updateSummary();
+  }
+
+  /* ---------- Logo-Größe (automatisch, ~40 % der Körperbreite) ---------- */
+  const bodyFractionCache = {};
+
+  // Misst die Flaschenkörper-Breite relativ zur Bildbreite aus der
+  // geladenen Bottle-Base (breiteste Zeile im Bereich 20 %–95 % Höhe).
+  function measureBodyFraction(size, cb) {
+    if (bodyFractionCache[size]) {
+      cb(bodyFractionCache[size]);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      let frac = LOGO_BODY_FALLBACK;
+      try {
+        const d = ctx.getImageData(0, 0, c.width, c.height).data;
+        let maxW = 0;
+        for (let y = Math.floor(c.height * 0.2); y < c.height * 0.95; y++) {
+          let minX = c.width, maxX = 0;
+          const row = y * c.width;
+          for (let x = 0; x < c.width; x++) {
+            if (d[(row + x) * 4 + 3] > 0) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+            }
+          }
+          if (maxX > minX && maxX - minX + 1 > maxW) maxW = maxX - minX + 1;
+        }
+        if (maxW > 0) frac = maxW / c.width;
+      } catch (e) { /* Canvas ggf. nicht lesbar -> Fallback */ }
+      bodyFractionCache[size] = frac;
+      cb(frac);
+    };
+    img.onerror = () => {
+      bodyFractionCache[size] = LOGO_BODY_FALLBACK;
+      cb(LOGO_BODY_FALLBACK);
+    };
+    img.src = ASSETS[size].base;
+  }
+
+  function setLogoWidth() {
+    measureBodyFraction(state.size, (bodyFrac) => {
+      const ringFrac = state.logo ? 1 : LOGO_RING_FRACTION;
+      const pct = (LOGO_BODY_FRACTION * bodyFrac / ringFrac) * 100;
+      logoOverlay.style.width = pct.toFixed(2) + "%";
+    });
   }
 
   /* ---------- Farbe ---------- */
@@ -213,6 +274,7 @@
     const hasCustom = !!state.logo;
     logoImg.src = hasCustom ? state.logo : DEFAULT_LOGO;
     logoOverlay.hidden = false;
+    setLogoWidth();
     // Skalierung relativ zur Bühne
     const w = bottleStage.clientWidth;
     const scale = state.logoScale / 100;

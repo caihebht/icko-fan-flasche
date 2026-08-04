@@ -193,7 +193,9 @@ body {
   position: absolute;
   left: 50%;
   top: 62%;
-  width: 40%;
+  /* Fallback ohne JS: Logo ≈ 40 % der Körperbreite (Ring ~84 % des PNG).
+     JS setzt die exakte Breite automatisch (siehe app.js setLogoWidth). */
+  width: 44.6%;
   transform: translate(-50%, -50%);
   pointer-events: none;
   line-height: 0;
