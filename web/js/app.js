@@ -34,6 +34,8 @@
     },
   };
 
+  const DEFAULT_LOGO = "assets/logo-icko-rund-schwarz.png";
+
   const state = {
     size: "05",
     qty: "120",
@@ -181,28 +183,21 @@
     });
     applyLogo();
   });
-
   function applyLogo() {
-    const hasLogo = !!state.logo;
-    if (hasLogo) {
-      logoImg.src = state.logo;
-      logoOverlay.hidden = false;
-      // Skalierung relativ zur Bühne
-      const w = bottleStage.clientWidth;
-      const scale = state.logoScale / 100;
-      const translateX = state.logoX * w * 0.004;   // -30..30 → ±12 % Breite
-      const translateY = state.logoY * w * 0.0025;  // -40..40 → ±10 % Breite
-      logoImg.style.transform =
-        "translate(" + translateX + "px," + translateY + "px) " +
-        "rotate(" + state.logoRotate + "deg) " +
-        "scale(" + scale + ")";
-    } else {
-      logoOverlay.hidden = true;
-      logoImg.removeAttribute("src");
-      logoImg.removeAttribute("style");
-    }
-    dropzone.hidden = hasLogo;
-    logoControls.hidden = !hasLogo;
+    const hasCustom = !!state.logo;
+    logoImg.src = hasCustom ? state.logo : DEFAULT_LOGO;
+    logoOverlay.hidden = false;
+    // Skalierung relativ zur Bühne
+    const w = bottleStage.clientWidth;
+    const scale = state.logoScale / 100;
+    const translateX = state.logoX * w * 0.004;   // -30..30 → ±12 % Breite
+    const translateY = state.logoY * w * 0.0025;  // -40..40 → ±10 % Breite
+    logoImg.style.transform =
+      "translate(" + translateX + "px," + translateY + "px) " +
+      "rotate(" + state.logoRotate + "deg) " +
+      "scale(" + scale + ")";
+    dropzone.hidden = hasCustom;
+    logoControls.hidden = false;
     updateSummary();
   }
 
@@ -227,7 +222,7 @@
     document.getElementById("sum-size").textContent = sizeLabel;
     document.getElementById("sum-color").textContent =
       state.pantone + " (" + state.hex + ")";
-    document.getElementById("sum-logo").textContent = state.logo ? "ja" : "nein";
+    document.getElementById("sum-logo").textContent = state.logo ? "ja (eigenes)" : "ja (ICKO)";
     document.getElementById("sum-qty").textContent = state.qty;
     document.getElementById("sum-price").textContent = price.toFixed(2).replace(".", ",") + " €";
     document.getElementById("sum-total").textContent =
@@ -238,7 +233,7 @@
       "Ich interessiere mich für ein Angebot:\n\n" +
       "Größe: " + sizeLabel + "\n" +
       "Farbe: " + state.pantone + " (" + state.hex + ")\n" +
-      "Logo: " + (state.logo ? "ja (im Konfigurator hochgeladen)" : "nein") + "\n" +
+      "Logo: " + (state.logo ? "ja (eigenes Logo hochgeladen)" : "ja (ICKO-Standardlogo)") + "\n" +
       "Stückzahl: " + state.qty + "\n" +
       "Stückpreis: " + price.toFixed(2) + " €\n" +
       "Gesamt: " + total.toLocaleString("de-DE") + " €\n" +
@@ -252,5 +247,6 @@
   setSize(state.size);
   setColor(state.hex, state.pantone);
   pmsInput.value = state.pantone.replace(/^PMS\s*/i, "");
+  applyLogo();
   updateSummary();
 })();

@@ -50,6 +50,14 @@ body {
   font-weight: 800;
   font-size: 1.25rem;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+}
+
+.site-logo {
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
 .logo-text .accent { color: var(--primary); }
@@ -184,7 +192,7 @@ body {
 #logo-overlay {
   position: absolute;
   left: 50%;
-  top: 55%;
+  top: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
   line-height: 0;
