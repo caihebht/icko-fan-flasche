@@ -183,7 +183,7 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  mix-blend-mode: color;
+  mix-blend-mode: multiply;
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
