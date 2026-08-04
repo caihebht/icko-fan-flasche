@@ -25,12 +25,12 @@
     "05": {
       base: "assets/flasche-05-base.png",
       tint: "assets/flasche-05-tint.png",
-      ratio: 420 / 1150,
+      ratio: 203 / 743,
     },
     "10": {
       base: "assets/flasche-10-base.png",
       tint: "assets/flasche-10-tint.png",
-      ratio: 480 / 1240,
+      ratio: 274 / 911,
     },
   };
 
