@@ -36,11 +36,11 @@
 
   const DEFAULT_LOGO = "assets/logo-icko-rund-weiss.png";
 
-  // Logo nimmt ca. 40 % der Breite des Flaschenkörpers ein.
+  // Logo nimmt ca. 80 % der Breite des Flaschenkörpers ein (2× von 40 %).
   // Der Ring des runden ICKO-Logos ist nur ~84 % der PNG-Kantenlänge,
   // deshalb wird das Element entsprechend größer skaliert, damit der
-  // sichtbare Kreis wirklich 40 % der Körperbreite misst.
-  const LOGO_BODY_FRACTION = 0.40;
+  // sichtbare Kreis wirklich 80 % der Körperbreite misst.
+  const LOGO_BODY_FRACTION = 0.80;
   const LOGO_RING_FRACTION = 0.843; // nur für das runde Standard-Logo
   const LOGO_BODY_FALLBACK = 0.94;  // Körperbreite / Bildbreite (Fallback)
 
