@@ -23,7 +23,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v8"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v9"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
@@ -140,13 +140,16 @@
   const bodyFractionCache = {};
 
   // Misst die Flaschenkörper-Breite relativ zur Bildbreite aus der
-  // geladenen Bottle-Base (breiteste Zeile im Bereich 20 %–95 % Höhe).
+  // Tint-Maske (deckt nur den Körper ab, Kappe ausgenommen) – damit
+  // sich das Logo immer in den Befärbungsbereich einfügt und nicht
+  // über den Flaschenkörper hinausragt.
   function measureBodyFraction(size, mode, cb) {
     const key = size + ":" + mode;
     if (bodyFractionCache[key]) {
       cb(bodyFractionCache[key]);
       return;
     }
+    const a = ASSETS[size];
     const img = new Image();
     img.onload = () => {
       const c = document.createElement("canvas");
@@ -158,7 +161,7 @@
       try {
         const d = ctx.getImageData(0, 0, c.width, c.height).data;
         let maxW = 0;
-        for (let y = Math.floor(c.height * 0.2); y < c.height * 0.95; y++) {
+        for (let y = 0; y < c.height; y++) {
           let minX = c.width, maxX = 0;
           const row = y * c.width;
           for (let x = 0; x < c.width; x++) {
@@ -178,7 +181,7 @@
       bodyFractionCache[key] = LOGO_BODY_FALLBACK;
       cb(LOGO_BODY_FALLBACK);
     };
-    img.src = ASSETS[size][mode];
+    img.src = mode === "klassisch" ? a.klassischTint : a.tint;
   }
 
   function setLogoWidth() {
