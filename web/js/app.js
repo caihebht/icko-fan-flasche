@@ -34,7 +34,7 @@
     },
   };
 
-  const DEFAULT_LOGO = "assets/logo-icko-rund-schwarz.png";
+  const DEFAULT_LOGO = "assets/logo-icko-rund-weiss.png";
 
   const state = {
     size: "05",
@@ -157,10 +157,36 @@
     }
     const reader = new FileReader();
     reader.onload = (e) => {
-      state.logo = e.target.result;
-      applyLogo();
+      const img = new Image();
+      img.onload = () => {
+        state.logo = toWhiteLogo(img);
+        applyLogo();
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  function toWhiteLogo(img) {
+    const max = 300;
+    const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = c.getContext("2d");
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const d = ctx.getImageData(0, 0, c.width, c.height);
+    const px = d.data;
+    for (let i = 0; i < px.length; i += 4) {
+      if (px[i + 3] === 0) continue;
+      if (Math.min(px[i], px[i + 1], px[i + 2]) >= 180) {
+        px[i + 3] = 0;
+      } else {
+        px[i] = px[i + 1] = px[i + 2] = 255;
+      }
+    }
+    ctx.putImageData(d, 0, 0);
+    return c.toDataURL("image/png");
   }
 
   /* ---------- Logo (Bearbeiten) ---------- */
