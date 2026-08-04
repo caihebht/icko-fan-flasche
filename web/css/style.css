@@ -192,18 +192,16 @@ body {
 #logo-overlay {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 62%;
+  width: 40%;
   transform: translate(-50%, -50%);
   pointer-events: none;
   line-height: 0;
 }
 #logo-img {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
-  max-width: 120px;
-  max-height: 120px;
-  object-fit: contain;
 }
 
 .preview-hint {
