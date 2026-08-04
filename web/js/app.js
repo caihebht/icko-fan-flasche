@@ -6,6 +6,7 @@
   "use strict";
 
   const bottleStage = document.getElementById("bottle-stage");
+  const bottleBlend = document.getElementById("bottle-blend");
   const bottleBase = document.getElementById("bottle-base");
   const bottleTint = document.getElementById("bottle-tint");
   const logoOverlay = document.getElementById("logo-overlay");
@@ -22,17 +23,24 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v6"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v7"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
+
+  const RENDER_MODES = {
+    farbtreu: { label: "Farbtreu", hint: "Farbtreu: Farbe wird exakt dargestellt." },
+    foto: { label: "Foto-Echt", hint: "Foto-Echt: echtes Fotolicht, Farben wirken gedämpfter." },
+  };
 
   const ASSETS = {
     "05": {
       base: ASSET("assets/flasche-05-base.png"),
+      foto: ASSET("assets/flasche-05-foto.png"),
       tint: ASSET("assets/flasche-05-tint.png"),
       ratio: 406 / 1486,
     },
     "10": {
       base: ASSET("assets/flasche-10-base.png"),
+      foto: ASSET("assets/flasche-10-foto.png"),
       tint: ASSET("assets/flasche-10-tint.png"),
       ratio: 548 / 1822,
     },
@@ -53,6 +61,7 @@
     qty: "120",
     hex: "#DA291C",
     pantone: "PMS 485 C",
+    renderMode: "farbtreu",
     logo: null,
     logoX: 0,
     logoY: 0,
@@ -89,14 +98,38 @@
     document.querySelectorAll("#size-group .btn-toggle").forEach((b) =>
       b.classList.toggle("active", b.dataset.size === size)
     );
-    const a = ASSETS[size];
-    bottleBase.src = a.base;
+    applyRenderBase();
+    setLogoWidth();
+    updateSummary();
+  }
+
+  /* ---------- Darstellung (Farbtreu / Foto-Echt) ---------- */
+  document.querySelectorAll("#render-group .btn-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRenderMode(btn.dataset.mode);
+    });
+  });
+
+  function setRenderMode(mode) {
+    state.renderMode = RENDER_MODES[mode] ? mode : "farbtreu";
+    document.querySelectorAll("#render-group .btn-toggle").forEach((b) =>
+      b.classList.toggle("active", b.dataset.mode === state.renderMode)
+    );
+    const hint = document.getElementById("render-hint");
+    if (hint) hint.textContent = RENDER_MODES[state.renderMode].hint;
+    const isFoto = state.renderMode === "foto";
+    bottleBlend.classList.toggle("mode-foto", isFoto);
+    bottleTint.classList.toggle("mode-foto", isFoto);
+    applyRenderBase();
+  }
+
+  function applyRenderBase() {
+    const a = ASSETS[state.size];
+    bottleBase.src = state.renderMode === "foto" ? a.foto : a.base;
     bottleTint.style.webkitMaskImage = "url(" + a.tint + ")";
     bottleTint.style.maskImage = "url(" + a.tint + ")";
     bottleBase.alt = "Vorschau der konfigurierten Icko Fan-Flasche (" +
-      (size === "05" ? "0,5 l" : "1,0 l") + ")";
-    setLogoWidth();
-    updateSummary();
+      (state.size === "05" ? "0,5 l" : "1,0 l") + ")";
   }
 
   /* ---------- Logo-Größe (automatisch, ~40 % der Körperbreite) ---------- */

@@ -179,6 +179,14 @@ body {
   height: auto;
   display: block;
 }
+.bottle-blend {
+  position: relative;
+  line-height: 0;
+}
+/* Foto-Echt: echtes Fotolicht des Produktfotos, Farben wirken gedämpfter */
+.bottle-blend.mode-foto {
+  filter: brightness(2.5);
+}
 #bottle-tint {
   position: absolute;
   inset: 0;
@@ -188,6 +196,9 @@ body {
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+}
+#bottle-tint.mode-foto {
+  mix-blend-mode: color;
 }
 #logo-overlay {
   position: absolute;
@@ -241,6 +252,10 @@ body {
 }
 
 .color-label { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
+
+.render-mode { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+.render-mode h3 { font-size: 1.05rem; margin-bottom: 10px; border-bottom: 2px solid var(--bg-alt); padding-bottom: 6px; }
+.render-hint { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
 
 .color-picker-row {
   display: flex;
