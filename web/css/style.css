@@ -200,6 +200,10 @@ body {
 #bottle-tint.mode-foto {
   mix-blend-mode: color;
 }
+/* Klassisch: photorealistisches PDF-Foto (Stand 02.08.), color-Blend ohne Aufhellung */
+#bottle-tint.mode-klassisch {
+  mix-blend-mode: color;
+}
 #logo-overlay {
   position: absolute;
   left: 50%;

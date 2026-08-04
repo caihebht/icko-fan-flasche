@@ -23,26 +23,29 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v7"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v8"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
     farbtreu: { label: "Farbtreu", hint: "Farbtreu: Farbe wird exakt dargestellt." },
     foto: { label: "Foto-Echt", hint: "Foto-Echt: echtes Fotolicht, Farben wirken gedämpfter." },
+    klassisch: { label: "Klassisch", hint: "Klassisch: photorealistisches Produktfoto (Stand 02.08.)." },
   };
 
   const ASSETS = {
     "05": {
-      base: ASSET("assets/flasche-05-base.png"),
+      farbtreu: ASSET("assets/flasche-05-base.png"),
       foto: ASSET("assets/flasche-05-foto.png"),
+      klassisch: ASSET("assets/flasche-05-klassisch.png"),
       tint: ASSET("assets/flasche-05-tint.png"),
-      ratio: 406 / 1486,
+      klassischTint: ASSET("assets/flasche-05-klassisch-tint.png"),
     },
     "10": {
-      base: ASSET("assets/flasche-10-base.png"),
+      farbtreu: ASSET("assets/flasche-10-base.png"),
       foto: ASSET("assets/flasche-10-foto.png"),
+      klassisch: ASSET("assets/flasche-10-klassisch.png"),
       tint: ASSET("assets/flasche-10-tint.png"),
-      ratio: 548 / 1822,
+      klassischTint: ASSET("assets/flasche-10-klassisch-tint.png"),
     },
   };
 
@@ -117,17 +120,18 @@
     );
     const hint = document.getElementById("render-hint");
     if (hint) hint.textContent = RENDER_MODES[state.renderMode].hint;
-    const isFoto = state.renderMode === "foto";
-    bottleBlend.classList.toggle("mode-foto", isFoto);
-    bottleTint.classList.toggle("mode-foto", isFoto);
+    bottleBlend.classList.toggle("mode-foto", state.renderMode === "foto");
+    bottleTint.classList.toggle("mode-foto", state.renderMode === "foto");
+    bottleTint.classList.toggle("mode-klassisch", state.renderMode === "klassisch");
     applyRenderBase();
+    setLogoWidth();
   }
 
   function applyRenderBase() {
     const a = ASSETS[state.size];
-    bottleBase.src = state.renderMode === "foto" ? a.foto : a.base;
-    bottleTint.style.webkitMaskImage = "url(" + a.tint + ")";
-    bottleTint.style.maskImage = "url(" + a.tint + ")";
+    bottleBase.src = a[state.renderMode];
+    bottleTint.style.webkitMaskImage = "url(" + (state.renderMode === "klassisch" ? a.klassischTint : a.tint) + ")";
+    bottleTint.style.maskImage = "url(" + (state.renderMode === "klassisch" ? a.klassischTint : a.tint) + ")";
     bottleBase.alt = "Vorschau der konfigurierten Icko Fan-Flasche (" +
       (state.size === "05" ? "0,5 l" : "1,0 l") + ")";
   }
@@ -137,9 +141,10 @@
 
   // Misst die Flaschenkörper-Breite relativ zur Bildbreite aus der
   // geladenen Bottle-Base (breiteste Zeile im Bereich 20 %–95 % Höhe).
-  function measureBodyFraction(size, cb) {
-    if (bodyFractionCache[size]) {
-      cb(bodyFractionCache[size]);
+  function measureBodyFraction(size, mode, cb) {
+    const key = size + ":" + mode;
+    if (bodyFractionCache[key]) {
+      cb(bodyFractionCache[key]);
       return;
     }
     const img = new Image();
@@ -166,18 +171,18 @@
         }
         if (maxW > 0) frac = maxW / c.width;
       } catch (e) { /* Canvas ggf. nicht lesbar -> Fallback */ }
-      bodyFractionCache[size] = frac;
+      bodyFractionCache[key] = frac;
       cb(frac);
     };
     img.onerror = () => {
-      bodyFractionCache[size] = LOGO_BODY_FALLBACK;
+      bodyFractionCache[key] = LOGO_BODY_FALLBACK;
       cb(LOGO_BODY_FALLBACK);
     };
-    img.src = ASSETS[size].base;
+    img.src = ASSETS[size][mode];
   }
 
   function setLogoWidth() {
-    measureBodyFraction(state.size, (bodyFrac) => {
+    measureBodyFraction(state.size, state.renderMode, (bodyFrac) => {
       const ringFrac = state.logo ? 1 : LOGO_RING_FRACTION;
       const pct = (LOGO_BODY_FRACTION * bodyFrac / ringFrac) * 100;
       logoOverlay.style.width = pct.toFixed(2) + "%";
