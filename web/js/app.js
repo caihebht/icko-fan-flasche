@@ -21,20 +21,23 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
+  const ASSET_VER = "v2"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET = (p) => `${p}?v=${ASSET_VER}`;
+
   const ASSETS = {
     "05": {
-      base: "assets/flasche-05-base.png",
-      tint: "assets/flasche-05-tint.png",
+      base: ASSET("assets/flasche-05-base.png"),
+      tint: ASSET("assets/flasche-05-tint.png"),
       ratio: 203 / 743,
     },
     "10": {
-      base: "assets/flasche-10-base.png",
-      tint: "assets/flasche-10-tint.png",
+      base: ASSET("assets/flasche-10-base.png"),
+      tint: ASSET("assets/flasche-10-tint.png"),
       ratio: 274 / 911,
     },
   };
 
-  const DEFAULT_LOGO = "assets/logo-icko-rund-weiss.png";
+  const DEFAULT_LOGO = ASSET("assets/logo-icko-rund-weiss.png");
 
   // Logo nimmt ca. 80 % der Breite des Flaschenkörpers ein (2× von 40 %).
   // Der Ring des runden ICKO-Logos ist nur ~84 % der PNG-Kantenlänge,
