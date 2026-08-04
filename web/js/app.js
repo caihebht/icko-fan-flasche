@@ -10,6 +10,7 @@
   const bottleTint = document.getElementById("bottle-tint");
   const logoOverlay = document.getElementById("logo-overlay");
   const logoImg = document.getElementById("logo-img");
+  const logoGloss = document.getElementById("logo-gloss");
   const swatchesEl = document.getElementById("swatches");
   const colorInput = document.getElementById("color-input");
   const pmsInput = document.getElementById("pms-input");
@@ -21,7 +22,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v4"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v5"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const ASSETS = {
@@ -278,15 +279,20 @@
     logoImg.src = hasCustom ? state.logo : DEFAULT_LOGO;
     logoOverlay.hidden = false;
     setLogoWidth();
+    // Glasur folgt der Logo-Silhouette (Spot-Gloss, maskiert auf den Druck)
+    const glossSrc = hasCustom ? state.logo : DEFAULT_LOGO;
+    logoGloss.style.setProperty("--logo-mask", 'url("' + glossSrc + '")');
     // Skalierung relativ zur Bühne
     const w = bottleStage.clientWidth;
     const scale = state.logoScale / 100;
     const translateX = state.logoX * w * 0.004;   // -30..30 → ±12 % Breite
     const translateY = state.logoY * w * 0.0025;  // -40..40 → ±10 % Breite
-    logoImg.style.transform =
+    const transform =
       "translate(" + translateX + "px," + translateY + "px) " +
       "rotate(" + state.logoRotate + "deg) " +
       "scale(" + scale + ")";
+    logoImg.style.transform = transform;
+    logoGloss.style.transform = transform;
     dropzone.hidden = hasCustom;
     logoControls.hidden = false;
     updateSummary();

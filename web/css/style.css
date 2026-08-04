@@ -183,7 +183,7 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  mix-blend-mode: color;
+  mix-blend-mode: multiply;
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
@@ -204,6 +204,21 @@ body {
   display: block;
   width: 100%;
   height: auto;
+}
+/* Glänzende Glasur (Spot-Gloss) über dem Logo: Lichtreflexion wird per
+   Mask auf die Logo-Silhouette begrenzt, wirkt wie UV-Spotlack auf dem Druck. */
+#logo-gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 62%);
+  -webkit-mask-image: var(--logo-mask);
+  mask-image: var(--logo-mask);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 .preview-hint {
