@@ -23,7 +23,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v9"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v10"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
@@ -320,9 +320,12 @@
     logoImg.src = hasCustom ? state.logo : DEFAULT_LOGO;
     logoOverlay.hidden = false;
     setLogoWidth();
-    // Glasur folgt der Logo-Silhouette (Spot-Gloss, maskiert auf den Druck)
+    // Glasur folgt der Logo-Silhouette (Spot-Gloss, maskiert auf den Druck).
+    // Absolute URL, sonst würde die relative URL aus dem externen CSS als
+    // css/assets/... aufgelöst und die Maske greift nicht (404).
     const glossSrc = hasCustom ? state.logo : DEFAULT_LOGO;
-    logoGloss.style.setProperty("--logo-mask", 'url("' + glossSrc + '")');
+    const glossUrl = new URL(glossSrc, window.location.href).href;
+    logoGloss.style.setProperty("--logo-mask", 'url("' + glossUrl + '")');
     // Skalierung relativ zur Bühne
     const w = bottleStage.clientWidth;
     const scale = state.logoScale / 100;
@@ -380,6 +383,20 @@
     );
     offerLink.href = "mailto:" + CONTACT_EMAIL + "?subject=" + subject + "&body=" + body;
   }
+
+  /* ---------- Logo-Glanz folgt der Maus (Lichtreflex wie echtes Produkt) ---------- */
+  bottleStage.addEventListener("pointermove", (e) => {
+    const r = logoOverlay.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    logoGloss.style.setProperty("--gx", x.toFixed(3));
+    logoGloss.style.setProperty("--gy", y.toFixed(3));
+  });
+  bottleStage.addEventListener("pointerleave", () => {
+    logoGloss.style.setProperty("--gx", "0.28");
+    logoGloss.style.setProperty("--gy", "0.18");
+  });
 
   /* ---------- Init ---------- */
   setSize(state.size);
