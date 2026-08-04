@@ -183,11 +183,12 @@ body {
   position: relative;
   line-height: 0;
 }
-/* Foto-Echt: der Flaschenkörper (Befärbungsbereich) wird exakt wie bei
-   Farbtreu eingefärbt (multiply auf hellem Body). Der Foto-Charakter bleibt
-   nur außerhalb des Körpers (Deckel), per vorverarbeitetem Foto-Base. */
+/* Foto-Echt: echtes Fotolicht des Produktfotos (Gamma-Lift hebt den dunklen
+   Körper an, ohne helle Stellen wie brightness() zu Weiß zu verblassen).
+   Data-URI statt #ID, weil url() in externem CSS relativ zur CSS-Datei
+   aufgelöst wird und die inline-SVG-ID im HTML nicht finden würde. */
 .bottle-blend.mode-foto {
-  filter: none;
+  filter: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%3E%3Cfilter%20id%3D%27fl%27%20color-interpolation-filters%3D%27sRGB%27%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%27gamma%27%20amplitude%3D%271%27%20exponent%3D%270.5%27/%3E%3CfeFuncG%20type%3D%27gamma%27%20amplitude%3D%271%27%20exponent%3D%270.5%27/%3E%3CfeFuncB%20type%3D%27gamma%27%20amplitude%3D%271%27%20exponent%3D%270.5%27/%3E%3CfeFuncA%20type%3D%27linear%27%20slope%3D%271%27%20intercept%3D%270%27/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3C/svg%3E#fl");
 }
 #bottle-tint {
   position: absolute;
@@ -198,6 +199,9 @@ body {
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+}
+#bottle-tint.mode-foto {
+  mix-blend-mode: color;
 }
 /* Klassisch: photorealistisches PDF-Foto (Stand 02.08.), color-Blend ohne Aufhellung */
 #bottle-tint.mode-klassisch {
