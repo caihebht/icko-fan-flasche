@@ -216,6 +216,8 @@ body {
   position: absolute;
   left: 50%;
   top: 62%;
+  /* Quadratisch bleiben, auch ohne <img>-Fallback im Layout */
+  aspect-ratio: 1 / 1;
   /* Fallback ohne JS: Logo ≈ 80 % der Körperbreite (Ring ~84 % des PNG).
      JS setzt die exakte Breite automatisch (siehe app.js setLogoWidth). */
   width: 89.3%;
@@ -223,15 +225,10 @@ body {
   pointer-events: none;
   line-height: 0;
 }
-#logo-img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 /* Glänzendes Logo auf einem Zylinder: Das Logo ist um die Flasche gewickelt
    und wird von app.js per Canvas-Projektion gerendert (Metall-Glanz wie
-   Heißfolie, Lichtreflex folgt der Maus). Das Canvas überdeckt das
-   <img>-Fallback ohne JavaScript. */
+   Heißfolie, Lichtreflex folgt der Maus). Nur ein Logo – hochgeladenes oder
+   Standard-ICKO-Logo – kein zusätzliches <img>-Fallback. */
 #logo-canvas {
   position: absolute;
   inset: 0;
