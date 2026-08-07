@@ -10,8 +10,7 @@
   const bottleBase = document.getElementById("bottle-base");
   const bottleTint = document.getElementById("bottle-tint");
   const logoOverlay = document.getElementById("logo-overlay");
-  const logoImg = document.getElementById("logo-img");
-  const logoGloss = document.getElementById("logo-gloss");
+  const logoCanvas = document.getElementById("logo-canvas");
   const swatchesEl = document.getElementById("swatches");
   const colorInput = document.getElementById("color-input");
   const pmsInput = document.getElementById("pms-input");
@@ -23,7 +22,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v10"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v11"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
@@ -70,6 +69,7 @@
     logoY: 0,
     logoScale: 100,
     logoRotate: 0,
+    logoAngle: 0,
   };
 
   /* ---------- Swatches ---------- */
@@ -189,6 +189,7 @@
       const ringFrac = state.logo ? 1 : LOGO_RING_FRACTION;
       const pct = (LOGO_BODY_FRACTION * bodyFrac / ringFrac) * 100;
       logoOverlay.style.width = pct.toFixed(2) + "%";
+      renderLogo();
     });
   }
 
@@ -301,6 +302,7 @@
     const key = "logo" + id.replace("logo-", "").replace(/^./, (c) => c.toUpperCase());
     el.addEventListener("input", () => {
       state[key] = parseInt(el.value, 10);
+      if (id === "logo-x") state.logoAngle = state.logoX * 6; // Umdrehung um die Flasche
       applyLogo();
     });
   });
@@ -317,26 +319,9 @@
   });
   function applyLogo() {
     const hasCustom = !!state.logo;
-    logoImg.src = hasCustom ? state.logo : DEFAULT_LOGO;
     logoOverlay.hidden = false;
     setLogoWidth();
-    // Glasur folgt der Logo-Silhouette (Spot-Gloss, maskiert auf den Druck).
-    // Absolute URL, sonst würde die relative URL aus dem externen CSS als
-    // css/assets/... aufgelöst und die Maske greift nicht (404).
-    const glossSrc = hasCustom ? state.logo : DEFAULT_LOGO;
-    const glossUrl = new URL(glossSrc, window.location.href).href;
-    logoGloss.style.setProperty("--logo-mask", 'url("' + glossUrl + '")');
-    // Skalierung relativ zur Bühne
-    const w = bottleStage.clientWidth;
-    const scale = state.logoScale / 100;
-    const translateX = state.logoX * w * 0.004;   // -30..30 → ±12 % Breite
-    const translateY = state.logoY * w * 0.0025;  // -40..40 → ±10 % Breite
-    const transform =
-      "translate(" + translateX + "px," + translateY + "px) " +
-      "rotate(" + state.logoRotate + "deg) " +
-      "scale(" + scale + ")";
-    logoImg.style.transform = transform;
-    logoGloss.style.transform = transform;
+    loadLogoSource();
     dropzone.hidden = hasCustom;
     logoControls.hidden = false;
     updateSummary();
@@ -384,18 +369,188 @@
     offerLink.href = "mailto:" + CONTACT_EMAIL + "?subject=" + subject + "&body=" + body;
   }
 
-  /* ---------- Logo-Glanz folgt der Maus (Lichtreflex wie echtes Produkt) ---------- */
-  bottleStage.addEventListener("pointermove", (e) => {
+  /* ---------- Logo-Zylinder: Wickeln + Drehen + Metall-Glanz ----------
+     Das Logo ist um die Flasche (Zylinder) gewickelt. Pixelspalte für
+     Pixelspalte wird der sichtbare Ausschnitt mit asin-Projektion
+     berechnet – dadurch schrumpft das Logo zu den Rändern hin (Perspektive)
+     und ragt nie über den Flaschenkörper hinaus. Mit der Maus am Körper
+     ziehen dreht die Flasche; der Metall-Glanz (Heißfolie) reflektiert
+     das Licht, das der Maus folgt. */
+  const cctx = logoCanvas.getContext("2d");
+  const wrapTmp = document.createElement("canvas");
+  const wctx = wrapTmp.getContext("2d");
+  let logoSource = null;    // {img, x0, y0, w, h} – Original-Logo + Inhalt-BBox
+  let logoPrepared = null;  // {canvas, x0, y0, w, h} – um logoRotate gedreht
+  let logoSourceKey = "";
+  let lightX = 0.28, lightY = 0.18;
+  let drag = null;
+
+  function loadLogoSource() {
+    const src = state.logo || DEFAULT_LOGO;
+    if (logoSource && logoSourceKey === src) {
+      prepareLogoSource();
+      return;
+    }
+    logoSourceKey = src;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      c.getContext("2d").drawImage(img, 0, 0);
+      logoSource = measureBBox(c);
+      prepareLogoSource();
+    };
+    img.onerror = () => {
+      logoSource = null;
+      logoPrepared = null;
+      renderLogo();
+    };
+    img.src = src;
+  }
+
+  // Bounding-Box des sichtbaren Inhalts (nicht-transparente Pixel)
+  function measureBBox(c) {
+    let d;
+    try {
+      d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+    } catch (e) { d = null; }
+    let minX = c.width, minY = c.height, maxX = 0, maxY = 0;
+    if (d) {
+      for (let y = 0; y < c.height; y++) {
+        const row = y * c.width;
+        for (let x = 0; x < c.width; x++) {
+          if (d[(row + x) * 4 + 3] > 16) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+    } else {
+      minX = 0; minY = 0; maxX = c.width - 1; maxY = c.height - 1;
+    }
+    return { canvas: c, x0: minX, y0: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  }
+
+  // Logo um logoRotate gedreht (ohne transparenten Rand) vorbereiten
+  function prepareLogoSource() {
+    if (!logoSource) return;
+    const { canvas, x0, y0, w, h } = logoSource;
+    const rad = state.logoRotate * Math.PI / 180;
+    const diag = Math.ceil(Math.hypot(w, h) + 4);
+    const c = document.createElement("canvas");
+    c.width = diag;
+    c.height = diag;
+    const cx = c.getContext("2d");
+    cx.translate(diag / 2, diag / 2);
+    cx.rotate(rad);
+    cx.drawImage(canvas, x0, y0, w, h, -w / 2, -h / 2, w, h);
+    logoPrepared = measureBBox(c);
+    renderLogo();
+  }
+
+  function renderLogo() {
+    if (!logoPrepared || !logoOverlay.clientWidth) return;
+    const boxW = logoOverlay.clientWidth;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = Math.max(2, Math.round(boxW * dpr));
+    if (logoCanvas.width !== W) {
+      logoCanvas.width = W;
+      logoCanvas.height = W;
+    }
+    const R = W / 2;
+    const scale = state.logoScale / 100;
+    const contentW = logoPrepared.w * scale;
+    const contentH = logoPrepared.h * scale;
+    const phi = contentW / R;               // Winkelspanne des Logos (rad)
+    const ang = state.logoAngle * Math.PI / 180;
+    const cy = R + state.logoY * W * 0.004; // vertikale Mitte (Y-Schieberegler)
+
+    // 1) Weißes Logo zylindrisch auf den Flaschenkörper wickeln
+    wrapTmp.width = W;
+    wrapTmp.height = W;
+    wctx.clearRect(0, 0, W, W);
+    for (let x = 0; x < W; x++) {
+      const t = (x + 0.5) / W;
+      const theta = Math.asin(2 * t - 1);   // sichtbarer Winkel -π/2..π/2
+      const p = (theta - ang + phi / 2) / phi;
+      if (p < 0 || p > 1) continue;         // Logoteil liegt auf der Rückseite
+      const sx = logoPrepared.x0 + p * logoPrepared.w;
+      wctx.drawImage(logoPrepared.canvas, sx, logoPrepared.y0, 1, logoPrepared.h,
+                     x, cy - contentH / 2, 1, contentH);
+    }
+
+    // 2) Metall-Folie: silberner Verlauf + Lichtreflex (wie zuvor im CSS)
+    cctx.clearRect(0, 0, W, W);
+    const gx = lightX * W, gy = lightY * W;
+    const grad = cctx.createLinearGradient(gx, 0, gx + 0.35 * W, 0.9 * W);
+    grad.addColorStop(0.00, "#b6bac2");
+    grad.addColorStop(0.06, "#ffffff");
+    grad.addColorStop(0.12, "#b0b4bc");
+    grad.addColorStop(0.25, "#d8dbe0");
+    grad.addColorStop(1.00, "#a6aab2");
+    cctx.fillStyle = grad;
+    cctx.fillRect(0, 0, W, W);
+    const rg = cctx.createRadialGradient(gx, gy, 0, gx, gy, W * 0.55);
+    rg.addColorStop(0.00, "rgba(255,255,255,0.9)");
+    rg.addColorStop(0.25, "rgba(255,255,255,0.2)");
+    rg.addColorStop(1.00, "rgba(255,255,255,0)");
+    cctx.globalCompositeOperation = "lighter";
+    cctx.fillStyle = rg;
+    cctx.fillRect(0, 0, W, W);
+    cctx.globalCompositeOperation = "destination-in";
+    cctx.drawImage(wrapTmp, 0, 0);
+    cctx.globalCompositeOperation = "source-over";
+  }
+
+  let renderQueued = false;
+  function scheduleRender() {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(() => {
+      renderQueued = false;
+      renderLogo();
+    });
+  }
+
+  function updateLight(e) {
     const r = logoOverlay.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-    const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-    logoGloss.style.setProperty("--gx", x.toFixed(3));
-    logoGloss.style.setProperty("--gy", y.toFixed(3));
+    lightX = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    lightY = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+  }
+
+  bottleStage.addEventListener("pointerdown", (e) => {
+    drag = { x: e.clientX, angle: state.logoAngle, id: e.pointerId };
+    bottleStage.classList.add("dragging");
+    bottleStage.setPointerCapture(e.pointerId);
+    updateLight(e);
+    scheduleRender();
   });
+  bottleStage.addEventListener("pointermove", (e) => {
+    updateLight(e);
+    if (drag) {
+      const sr = bottleStage.getBoundingClientRect();
+      state.logoAngle = drag.angle + ((e.clientX - drag.x) / sr.width) * 180;
+      const slider = document.getElementById("logo-x");
+      if (slider) slider.value = Math.max(-30, Math.min(30, Math.round(state.logoAngle / 6)));
+    }
+    scheduleRender();
+  });
+  function endDrag(e) {
+    if (drag && e.pointerId !== drag.id) return;
+    drag = null;
+    bottleStage.classList.remove("dragging");
+  }
+  bottleStage.addEventListener("pointerup", endDrag);
+  bottleStage.addEventListener("pointercancel", endDrag);
   bottleStage.addEventListener("pointerleave", () => {
-    logoGloss.style.setProperty("--gx", "0.28");
-    logoGloss.style.setProperty("--gy", "0.18");
+    if (drag) return;
+    lightX = 0.28;
+    lightY = 0.18;
+    scheduleRender();
   });
 
   /* ---------- Init ---------- */
