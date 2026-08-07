@@ -22,7 +22,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v13"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v14"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
@@ -50,12 +50,14 @@
 
   const DEFAULT_LOGO = ASSET("assets/logo-icko-rund-weiss.png");
 
-  // Logo nimmt ca. 80 % der Breite des Flaschenkörpers ein (2× von 40 %).
-  // Der Ring des runden ICKO-Logos ist nur ~84 % der PNG-Kantenlänge,
-  // deshalb wird das Element entsprechend größer skaliert, damit der
-  // sichtbare Kreis wirklich 80 % der Körperbreite misst.
+  // Logo-Inhalt nimmt ca. 80 % der Breite des Flaschenkörpers ein.
+  // Der Ring des runden ICKO-Logos ist nur ~84 % der PNG-Kantenlänge;
+  // damit der sichtbare Kreis wirklich 80 % der Körperbreite misst, wird
+  // das Element größer skaliert (Overlay = Inhalt / LOGO_RING_FRACTION).
+  // Der gleiche Faktor gilt für eigene Logos, damit Overlay-Größe und
+  // Wickel-Geometrie (Krümmung beim Drehen) identisch zum Standard-Logo sind.
   const LOGO_BODY_FRACTION = 0.80;
-  const LOGO_RING_FRACTION = 0.843; // nur für das runde Standard-Logo
+  const LOGO_RING_FRACTION = 0.843; // Inhalt-Breite relativ zur Overlay-Breite
   const LOGO_BODY_FALLBACK = 0.94;  // Körperbreite / Bildbreite (Fallback)
   // Zylinder-Krümmung des Logos: 1 = volle Krümmung (Ränder stark gestaucht),
   // kleiner = flacher. Im Ruhezustand ist die Krümmung reduziert, damit das
@@ -193,7 +195,7 @@
 
   function setLogoWidth() {
     measureBodyFraction(state.size, state.renderMode, (bodyFrac) => {
-      const ringFrac = state.logo ? 1 : LOGO_RING_FRACTION;
+      const ringFrac = LOGO_RING_FRACTION;
       const pct = (LOGO_BODY_FRACTION * bodyFrac / ringFrac) * 100;
       logoOverlay.style.width = pct.toFixed(2) + "%";
       renderLogo();
@@ -470,9 +472,10 @@
     const R = W / 2;
     const scale = state.logoScale / 100;
     // Logo-Größe relativ zur Overlay-Breite (nicht in Quell-Pixeln):
-    // Standard-Rundlogo füllt 84,3 % des Overlays, eigene Logos 100 % –
-    // wie in v10, sodass das komplette Logo von vorn sichtbar ist.
-    const contentW = W * (state.logo ? 1 : LOGO_RING_FRACTION) * scale;
+    // Inhalte beider Logo-Typen füllen denselben Anteil des Overlays
+    // (Standard-Rundlogo und eigene Logos), sodass die Wickel-Geometrie
+    // beim Drehen identisch ist – das komplette Logo bleibt von vorn sichtbar.
+    const contentW = W * LOGO_RING_FRACTION * scale;
     const contentH = contentW * logoPrepared.h / logoPrepared.w;
     // Adaptive Krümmung: flach im Ruhezustand, volle Krümmung beim Drehen
     // (180° = ganze Umdrehung) oder Vergrößern (ab 100 %).
