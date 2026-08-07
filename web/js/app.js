@@ -22,7 +22,7 @@
   const qtyBonus = document.getElementById("qty-bonus");
   const offerLink = document.getElementById("offer-link");
 
-  const ASSET_VER = "v12"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
+  const ASSET_VER = "v13"; // Bump bei Asset-/CSS-Änderungen gegen Browser-Cache
   const ASSET = (p) => `${p}?v=${ASSET_VER}`;
 
   const RENDER_MODES = {
@@ -57,6 +57,12 @@
   const LOGO_BODY_FRACTION = 0.80;
   const LOGO_RING_FRACTION = 0.843; // nur für das runde Standard-Logo
   const LOGO_BODY_FALLBACK = 0.94;  // Körperbreite / Bildbreite (Fallback)
+  // Zylinder-Krümmung des Logos: 1 = volle Krümmung (Ränder stark gestaucht),
+  // kleiner = flacher. Im Ruhezustand ist die Krümmung reduziert, damit das
+  // komplette Logo von vorn sichtbar ist (wie vor der Zylinder-Umstellung).
+  // Beim Drehen oder Vergrößern steigt sie sanft auf den vollen Wert.
+  const ZYLINDER_CURVE_MIN = 0.75;
+  const ZYLINDER_CURVE_MAX = 1.0;
 
   const state = {
     size: "05",
@@ -70,6 +76,7 @@
     logoScale: 100,
     logoRotate: 0,
     logoAngle: 0,
+    zylinderCurve: ZYLINDER_CURVE_MIN,
   };
 
   /* ---------- Swatches ---------- */
@@ -462,9 +469,22 @@
     }
     const R = W / 2;
     const scale = state.logoScale / 100;
-    const contentW = logoPrepared.w * scale;
-    const contentH = logoPrepared.h * scale;
-    const phi = contentW / R;               // Winkelspanne des Logos (rad)
+    // Logo-Größe relativ zur Overlay-Breite (nicht in Quell-Pixeln):
+    // Standard-Rundlogo füllt 84,3 % des Overlays, eigene Logos 100 % –
+    // wie in v10, sodass das komplette Logo von vorn sichtbar ist.
+    const contentW = W * (state.logo ? 1 : LOGO_RING_FRACTION) * scale;
+    const contentH = contentW * logoPrepared.h / logoPrepared.w;
+    // Adaptive Krümmung: flach im Ruhezustand, volle Krümmung beim Drehen
+    // (180° = ganze Umdrehung) oder Vergrößern (ab 100 %).
+    const bend = Math.abs(state.logoAngle) / 180 +
+                 Math.max(0, (state.logoScale - 100) / 100);
+    const target = Math.min(ZYLINDER_CURVE_MAX,
+                            ZYLINDER_CURVE_MIN + (ZYLINDER_CURVE_MAX - ZYLINDER_CURVE_MIN) * bend);
+    state.zylinderCurve += (target - state.zylinderCurve) * 0.2;
+    if (Math.abs(target - state.zylinderCurve) > 0.001) scheduleRender();
+    const c = state.zylinderCurve;
+    const Rz = R / c;               // effektiver Radius: größer = flacher
+    const phi = contentW / Rz;      // Winkelspanne des Logos (rad)
     const ang = state.logoAngle * Math.PI / 180;
     const cy = R + state.logoY * W * 0.004; // vertikale Mitte (Y-Schieberegler)
 
@@ -474,7 +494,7 @@
     wctx.clearRect(0, 0, W, W);
     for (let x = 0; x < W; x++) {
       const t = (x + 0.5) / W;
-      const theta = Math.asin(2 * t - 1);   // sichtbarer Winkel -π/2..π/2
+      const theta = Math.asin(c * (2 * t - 1)); // -asin(c)..asin(c)
       const p = (theta - ang + phi / 2) / phi;
       if (p < 0 || p > 1) continue;         // Logoteil liegt auf der Rückseite
       const sx = logoPrepared.x0 + p * logoPrepared.w;
